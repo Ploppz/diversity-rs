@@ -1,5 +1,9 @@
 use ndarray::prelude::*;
 
+#[cfg(test)]
+#[macro_use]
+extern crate assert_approx_eq;
+
 
 macro_rules! max {
     {$x:expr $(, $y:expr)+} => {
@@ -56,33 +60,38 @@ pub fn unanchored_l2_discrepancy(points: &Array2<f32>) -> f32 {
     (t1 - t2 + t3).sqrt()
 }
 
-/*
 #[cfg(test)]
 mod tests {
     use ndarray::prelude::*;
     use rand::{Rng};
     use crate::*;
+    use ndarray_rand::RandomExt;
     #[test]
     fn uniform() {
         let mut rng = rand::thread_rng();
-        let N = 1000;
-        let D = 2;
-        let mut points = Array2::<f32>::zeros((N, D));
-        points.iter_mut().map(|_| rng.gen::<f32>());
-        let a = unanchored_L2_discrepancy(points);
-        assert!(a > 1.0/N as f32);
+        const N: usize = 1000;
+        const D: usize = 2;
+        let points = Array2::<f32>::random((N, D), rand::distributions::Uniform::from(0.0..0.1));
+        let a = unanchored_l2_discrepancy(&points);
         assert!(a < 0.09);
-        println!("{}", a);
+        assert!(a > 1.0/N as f32);
     }
 
     #[test]
     fn concentrated() {
-        let mut rng = rand::thread_rng();
-        let N = 1000;
-        let D = 2;
-        let mut points = Array2::<f32>::from_elem((N, D), 0.5);
-        let a = unanchored_L2_discrepancy(points);
-        println!("{}", a);
+        const N: usize = 1000;
+        const D: usize = 2;
+        let points = Array2::<f32>::from_elem((N, D), 0.5);
+        let a = unanchored_l2_discrepancy(&points);
+        assert_approx_eq!(a, 0.195434);
+    }
+    #[test]
+    fn stability() {
+        let mut points = Array2::zeros((3, 2));
+        points[[0,0]] = 0.5; points[[0, 1]] = 0.5;
+        points[[1,0]] = 0.2; points[[1, 1]] = 0.8;
+        points[[2,0]] = 0.6; points[[2, 1]] = 0.3;
+        let a = unanchored_l2_discrepancy(&points);
+        assert_approx_eq!(a, 0.0959456);
     }
 }
-*/
