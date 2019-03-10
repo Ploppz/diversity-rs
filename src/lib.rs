@@ -24,17 +24,17 @@ macro_rules! min {
 
 // pub fn unanchored_l2_discrepancy<T: Index<usize, Output=f64>, I: Iterator<Item=T>>(points: I) -> f64 {
 // ^^ TODO: actually can generalize using ExactSizeIterator, because it provides len()
-pub fn unanchored_l2_discrepancy(points: &Array2<f32>) -> f32 {
+pub fn unanchored_l2_discrepancy(points: &Array2<f64>) -> f64 {
     assert!(points.len() > 0);
     let n_points = points.len_of(Axis(0));
     let n_dim = points.len_of(Axis(1));
-    let dims = n_dim as f32;
+    let dims = n_dim as f64;
     assert!(points.iter().all(|x| *x >= 0.0 && *x <= 1.0));
     if n_points == 0 {
         return 0.0
     }
     
-    let t3 = 12.0_f32.powf(-dims as f32);
+    let t3 = 12.0_f64.powf(-dims as f64);
     let mut t2 = 0.0;
 
     for n in 0..n_points {
@@ -44,7 +44,7 @@ pub fn unanchored_l2_discrepancy(points: &Array2<f32>) -> f32 {
         }
         t2 += t2_temp;
     }
-    t2 = 2.0_f32.powf(1.0 - dims as f32) * t2 / n_points as f32;
+    t2 = 2.0_f64.powf(1.0 - dims as f64) * t2 / n_points as f64;
 
     let mut t1 = 0.0;
     for n in 0..n_points {
@@ -56,7 +56,7 @@ pub fn unanchored_l2_discrepancy(points: &Array2<f32>) -> f32 {
             t1 += t1_temp;
         }
     }
-    t1 = t1 / n_points.pow(2) as f32;
+    t1 = t1 / n_points.pow(2) as f64;
     (t1 - t2 + t3).sqrt()
 }
 
@@ -71,17 +71,17 @@ mod tests {
         let mut rng = rand::thread_rng();
         const N: usize = 1000;
         const D: usize = 2;
-        let points = Array2::<f32>::random((N, D), rand::distributions::Uniform::from(0.0..0.1));
+        let points = Array2::<f64>::random((N, D), rand::distributions::Uniform::from(0.0..0.1));
         let a = unanchored_l2_discrepancy(&points);
         assert!(a < 0.09);
-        assert!(a > 1.0/N as f32);
+        assert!(a > 1.0/N as f64);
     }
 
     #[test]
     fn concentrated() {
         const N: usize = 1000;
         const D: usize = 2;
-        let points = Array2::<f32>::from_elem((N, D), 0.5);
+        let points = Array2::<f64>::from_elem((N, D), 0.5);
         let a = unanchored_l2_discrepancy(&points);
         assert_approx_eq!(a, 0.195434);
     }
