@@ -24,7 +24,7 @@ macro_rules! min {
 
 // pub fn unanchored_l2_discrepancy<T: Index<usize, Output=f64>, I: Iterator<Item=T>>(points: I) -> f64 {
 // ^^ TODO: actually can generalize using ExactSizeIterator, because it provides len()
-pub fn unanchored_l2_discrepancy(points: &Array2<f64>) -> f64 {
+pub fn unanchored_l2_discrepancy(points: &ArrayView2<f64>) -> f64 {
     assert!(points.len() > 0);
     let n_points = points.len_of(Axis(0));
     let n_dim = points.len_of(Axis(1));
