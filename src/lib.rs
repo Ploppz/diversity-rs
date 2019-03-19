@@ -72,7 +72,7 @@ mod tests {
         const N: usize = 1000;
         const D: usize = 2;
         let points = Array2::<f64>::random((N, D), rand::distributions::Uniform::from(0.0..0.1));
-        let a = unanchored_l2_discrepancy(&points);
+        let a = unanchored_l2_discrepancy(&points.view());
         assert!(a < 0.09);
         assert!(a > 1.0/N as f64);
     }
@@ -82,7 +82,7 @@ mod tests {
         const N: usize = 1000;
         const D: usize = 2;
         let points = Array2::<f64>::from_elem((N, D), 0.5);
-        let a = unanchored_l2_discrepancy(&points);
+        let a = unanchored_l2_discrepancy(&points.view());
         assert_approx_eq!(a, 0.195434);
     }
     #[test]
@@ -91,7 +91,18 @@ mod tests {
         points[[0,0]] = 0.5; points[[0, 1]] = 0.5;
         points[[1,0]] = 0.2; points[[1, 1]] = 0.8;
         points[[2,0]] = 0.6; points[[2, 1]] = 0.3;
-        let a = unanchored_l2_discrepancy(&points);
+        let a = unanchored_l2_discrepancy(&points.view());
         assert_approx_eq!(a, 0.0959456);
+    }
+    #[test]
+    fn correct_unanchored_l2_discrepancy() {
+        let mut points = Array2::zeros((4, 2));
+        points[[0,0]] = 0.8; points[[0,1]] = 0.1;
+        points[[1,0]] = 0.9; points[[1,1]] = 0.2;
+        points[[2,0]] = 1.0; points[[2,1]] = 0.3;
+        points[[3,0]] = 0.2; points[[3,1]] = 0.6;
+        let a = unanchored_l2_discrepancy(&points.view());
+        assert_approx_eq!(a, 0.06280481227138923);
+        println!("{}", a);
     }
 }
